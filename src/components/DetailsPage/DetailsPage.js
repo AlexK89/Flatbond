@@ -34,7 +34,7 @@ class DetailsPage extends Component {
                     </li>
                     <li className="details_page__list__item">
                         <p className="details_page__list__item__label">Rent:</p>
-                        <p className="details_page__list__item__value">200</p>
+                        <p className="details_page__list__item__value">{[this.props.currencySym, userData.selectedPrice]}</p>
                     </li>
                     <li className="details_page__list__item">
                         <p className="details_page__list__item__label">Fixed membership:</p>
@@ -42,7 +42,7 @@ class DetailsPage extends Component {
                     </li>
                     <li className="details_page__list__item">
                         <p className="details_page__list__item__label">Member fee:</p>
-                        <p className="details_page__list__item__value">{userData.memberFee}</p>
+                        <p className="details_page__list__item__value">{[this.props.currencySym, userData.memberFee]}</p>
                     </li>
                 </ul>
             </div>

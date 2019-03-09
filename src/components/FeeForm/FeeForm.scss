@@ -84,36 +84,24 @@
         flex: 1 1 auto;
         position: relative;
         height: 45px;
+        display: flex;
 
         input {
-          width: 80%;
-          position: absolute;
-          pointer-events: none;
-          top: 15px;
-          left: 10%;
+          width: 100%;
 
           &:focus {
             outline: none;
           }
 
           &::-webkit-slider-thumb {
-            pointer-events: all;
-            position: relative;
-            z-index: 100;
             margin-top: -5px;
           }
 
           &::-ms-thumb {
-            pointer-events: all;
-            position: relative;
-            z-index: 100;
             margin-top: -5px;
           }
 
           &::-moz-range-thumb {
-            pointer-events: all;
-            position: relative;
-            z-index: 100;
             margin-top: -5px;
           }
 

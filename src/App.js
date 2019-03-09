@@ -5,15 +5,17 @@ import FeeForm from './components/FeeForm/FeeForm';
 import DetailsPage from './components/DetailsPage/DetailsPage';
 import './App.scss';
 
-const WEEK = 'week';
-const MONTH = 'month';
+const timeFrames = {
+    WEEK: 'week',
+    MONTH: 'month'
+};
 
 class App extends Component {
     state = {
         membership: null,
         feeFormDefault: {
             currencySym: '£',
-            timeFrame: [WEEK, MONTH],
+            timeFrame: [timeFrames.WEEK, timeFrames.MONTH],
             week: {
                 min: '25',
                 max: '2000'
@@ -56,6 +58,7 @@ class App extends Component {
                             <Route exact path={'/details'} component={() =>
                                 <DetailsPage userData={this.state.userData}
                                              resetForm={this.resetForm}
+                                             currencySym={this.state.feeFormDefault.currencySym}
                                              fixedMembership={this.state.membership.fixed_membership_fee}/>
                             }/>
                             <Route path={'/'} component={() =>
@@ -64,10 +67,7 @@ class App extends Component {
                                          submitFormHandler={this.submitFormHandler}/>}
                             />
                         </Switch>
-
                     </div>
-
-
                 }
             </div>
         );

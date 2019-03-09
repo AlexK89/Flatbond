@@ -13,35 +13,29 @@ class FeeForm extends Component {
 
         this.setState({
             timeFrame: timeFrame[0],
-            priceRange: {
-                min: this.props.feeFormDefault[timeFrame[0]].min,
-                max: this.props.feeFormDefault[timeFrame[0]].max
-            },
+            selectedPrice: this.props.feeFormDefault[timeFrame[0]].min,
             memberFee: 0
-        })
+        });
+
+        this.calculateMembershipFee(this.props.feeFormDefault[timeFrame[0]].min)
     }
 
     selectChangeHandler = (event) => {
         const timeFrame = event.target.value;
         this.setState({
             timeFrame,
-            priceRange: {
-                min: this.props.feeFormDefault[timeFrame].min,
-                max: this.props.feeFormDefault[timeFrame].max
-            }
-        })
+            selectedPrice: this.props.feeFormDefault[timeFrame].min
+        });
+
+        this.calculateMembershipFee(this.props.feeFormDefault[timeFrame].min)
     };
 
     sliderHandler = (event) => {
-        const slidersParent = event.target.parentNode;
-        const sliderMinVal = parseInt(slidersParent.querySelector('.slider_min').value);
-        const sliderMaxVal = parseInt(slidersParent.querySelector('.slider_max').value);
-        // Sorting values as values order might be wrong
-        const sortedArr = [sliderMinVal, sliderMaxVal].sort((a, b) => a - b);
-
         this.setState({
-            priceRange: {min: sortedArr[0], max: sortedArr[1]}
-        })
+            selectedPrice: parseInt(event.target.value)
+        });
+
+        this.calculateMembershipFee(parseInt(event.target.value))
     };
 
     renderSelect = () => {
@@ -63,34 +57,29 @@ class FeeForm extends Component {
 
     sliders = () => {
         const {feeFormDefault} = this.props;
-        const {timeFrame, priceRange} = this.state;
-        const minPrice = priceRange ? priceRange.min : feeFormDefault[timeFrame].min;
-        const maxPrice = priceRange ? priceRange.max : feeFormDefault[timeFrame].max;
+        const {timeFrame, selectedPrice} = this.state;
+        const minPrice = selectedPrice ? selectedPrice : feeFormDefault[timeFrame].min;
 
         return (
             <div className="fee_form__price_range__slider">
-                <p>Min {[feeFormDefault.currencySym, minPrice]}</p>
+                <p>Price {[feeFormDefault.currencySym, minPrice]}</p>
                 <div className="sliders">
                     <input type="range" className="slider_min" onChange={this.sliderHandler}
                            value={minPrice}
                            min={feeFormDefault[timeFrame].min} max={feeFormDefault[timeFrame].max} step={1}/>
-                    <input type="range" className="slider_max" onChange={this.sliderHandler}
-                           value={maxPrice}
-                           min={feeFormDefault[timeFrame].min} max={feeFormDefault[timeFrame].max} step={1}/>
                 </div>
-                <p>Max {[feeFormDefault.currencySym, maxPrice]}</p>
             </div>
         )
     };
 
-    calculateMembershipFee = (event) => {
+    calculateMembershipFee = (price) => {
         const {membership} = this.props;
-        const rentValue = event.target.value ? parseInt(event.target.value) : 0;
+        const pricePerWeek = this.state.timeFrame === 'month' ? (price / 30 * 7) : price;
         let memberFee = 0;
 
         (membership.fixed_membership_fee) ?
             memberFee = membership.fixed_membership_fee_amount * 1.2 :
-            ((rentValue > 0 && rentValue < 120) ? memberFee = 120 : memberFee = rentValue * 1.2);
+            ((pricePerWeek > 0 && pricePerWeek < 120) ? memberFee = 120 : memberFee = pricePerWeek * 1.2);
 
         this.setState({memberFee: Math.floor(memberFee)})
     };
@@ -130,20 +119,12 @@ class FeeForm extends Component {
                     <p><label htmlFor="postcode">Post code</label></p>
                     <div className={"fee_form__post_code__input_wrapper"}>
                         <input type="text" id="postcode" pattern={UK_POST_CODE} required
-                               onChange={this.postCodeHandler}/>
+                               onChange={this.postCodeHandler}
+                               title="Please provide valid post code"/>
                     </div>
 
                 </div>
                 <div className="fee_form__membership_fee">
-                    <div className="fee_form__membership_fee__input_container">
-                        <p><label htmlFor="membership">Rent price per week:</label></p>
-                        <div className={"fee_form__membership_fee__input_container__input_wrapper"}>
-                            <input type="number" min="0" id="membership"
-                                   required
-                                   onChange={this.calculateMembershipFee}/>
-                        </div>
-                    </div>
-
                     <p>Membership fee: <span>{this.state.memberFee}</span> inc. 20% VAT</p>
                 </div>
                 <div className="fee_form__submit">
