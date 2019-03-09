@@ -90,7 +90,7 @@ class FeeForm extends Component {
             memberFee = membership.fixed_membership_fee_amount * 1.2 :
             ((rentValue > 0 && rentValue < 120) ? memberFee = 120 : memberFee = rentValue * 1.2);
 
-        this.setState({ memberFee })
+        this.setState({ memberFee: Math.floor(memberFee) })
     };
 
     postCodeHandler = (event) => this.setState({postCode: event.target.value});
@@ -104,27 +104,37 @@ class FeeForm extends Component {
             <form onSubmit={this.handleSubmit} className="fee_form">
                 <fieldset className="fee_form__price_range">
                     <div className="fee_form__price_range__duration">
-                        <h4>Price:</h4>
+                        <h4>Time Frame:</h4>
                         <div className="fee_form__price_range__duration__select">
-                            <p>{this.state.timeRange}</p>
-                            {this.renderSelect()}
+                            <p>
+                                <img src={require('../../img/calendar.png')} alt="calendar"/>
+                                {this.state.timeRange}
+                                {this.renderSelect()}
+                            </p>
+
                         </div>
 
                     </div>
                     {this.sliders()}
                 </fieldset>
-                <fieldset className="fee_form__post_code">
-                    <label htmlFor="postcode">Post code</label>
-                    <input type="text" id="postcode" pattern={UK_POST_CODE} required onChange={this.postCodeHandler}/>
-                </fieldset>
+                <div className="fee_form__post_code">
+                    <p><label htmlFor="postcode">Post code</label></p>
+                    <div className={"fee_form__post_code__input_wrapper"}>
+                        <input type="text" id="postcode" pattern={UK_POST_CODE} required onChange={this.postCodeHandler}/>
+                    </div>
+
+                </div>
                 <div className="fee_form__membership_fee">
-                    <label htmlFor="membership">Rent price per week:</label>
-                    <input type="number" min="0" id="membership" required onChange={this.calculateMembershipFee}/>
+                    <div className="fee_form__membership_fee__input_container">
+                        <p><label htmlFor="membership">Rent price per week:</label></p>
+                        <div className={"fee_form__membership_fee__input_container__input_wrapper"}><input type="number" min="0" id="membership" required onChange={this.calculateMembershipFee}/></div>
+                    </div>
+
                     <p>Membership fee: <span>{this.state.memberFee}</span> inc. 20% VAT</p>
                 </div>
-                <fieldset className="fee_form__submit">
+                <div className="fee_form__submit">
                     <button type="submit">Submit</button>
-                </fieldset>
+                </div>
             </form>) : <h1>Loading...</h1>
     }
 }
