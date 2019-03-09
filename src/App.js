@@ -51,6 +51,7 @@ class App extends Component {
                     this.state.membership &&
                     <div className="create_page">
                         <div className="create_page__header">
+                            <img src={require('./img/background.jpg')} alt="background_image"/>
                             <p className={!this.state.userData ? 'fill' : ''}><span>1</span></p>
                             <p className={this.state.userData ? 'fill' : ''}><span>2</span></p>
                         </div>
