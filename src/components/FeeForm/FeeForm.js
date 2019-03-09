@@ -1,4 +1,6 @@
 import React, {Component} from 'react';
+import {withRouter} from "react-router-dom";
+import {postUserData} from "../../API";
 import './FeeForm.scss';
 
 const UK_POST_CODE = "([Gg][Ii][Rr] 0[Aa]{2})|((([A-Za-z][0-9]{1,2})|(([A-Za-z][A-Ha-hJ-Yj-y][0-9]{1,2})|(([A-Za-z][0-9][A-Za-z])|([A-Za-z][A-Ha-hJ-Yj-y][0-9][A-Za-z]?))))\\s?[0-9][A-Za-z]{2})";
@@ -7,25 +9,25 @@ class FeeForm extends Component {
     state = {};
 
     componentDidMount() {
-        const timeRange = this.props.feeFormDefault.timeRange;
+        const timeFrame = this.props.feeFormDefault.timeFrame;
 
         this.setState({
-            timeRange: timeRange[0],
+            timeFrame: timeFrame[0],
             priceRange: {
-                min: this.props.feeFormDefault[timeRange[0]].min,
-                max: this.props.feeFormDefault[timeRange[0]].max
+                min: this.props.feeFormDefault[timeFrame[0]].min,
+                max: this.props.feeFormDefault[timeFrame[0]].max
             },
             memberFee: 0
         })
     }
 
     selectChangeHandler = (event) => {
-        const timeRange = event.target.value;
+        const timeFrame = event.target.value;
         this.setState({
-            timeRange,
+            timeFrame,
             priceRange: {
-                min: this.props.feeFormDefault[timeRange].min,
-                max: this.props.feeFormDefault[timeRange].max
+                min: this.props.feeFormDefault[timeFrame].min,
+                max: this.props.feeFormDefault[timeFrame].max
             }
         })
     };
@@ -46,12 +48,12 @@ class FeeForm extends Component {
         const {feeFormDefault} = this.props;
 
         return (
-            <select defaultValue={feeFormDefault.timeRange[0]}
+            <select defaultValue={feeFormDefault.timeFrame[0]}
                     name="duration_type"
                     id="duration_type"
                     onChange={this.selectChangeHandler}>
                 {
-                    feeFormDefault.timeRange.map((time, index) => {
+                    feeFormDefault.timeFrame.map((time, index) => {
                         return <option key={index} value={time}>{time}</option>
                     })
                 }
@@ -61,9 +63,9 @@ class FeeForm extends Component {
 
     sliders = () => {
         const {feeFormDefault} = this.props;
-        const {timeRange, priceRange} = this.state;
-        const minPrice = priceRange ? priceRange.min : feeFormDefault[timeRange].min;
-        const maxPrice = priceRange ? priceRange.max : feeFormDefault[timeRange].max;
+        const {timeFrame, priceRange} = this.state;
+        const minPrice = priceRange ? priceRange.min : feeFormDefault[timeFrame].min;
+        const maxPrice = priceRange ? priceRange.max : feeFormDefault[timeFrame].max;
 
         return (
             <div className="fee_form__price_range__slider">
@@ -71,10 +73,10 @@ class FeeForm extends Component {
                 <div className="sliders">
                     <input type="range" className="slider_min" onChange={this.sliderHandler}
                            value={minPrice}
-                           min={feeFormDefault[timeRange].min} max={feeFormDefault[timeRange].max} step={1}/>
+                           min={feeFormDefault[timeFrame].min} max={feeFormDefault[timeFrame].max} step={1}/>
                     <input type="range" className="slider_max" onChange={this.sliderHandler}
                            value={maxPrice}
-                           min={feeFormDefault[timeRange].min} max={feeFormDefault[timeRange].max} step={1}/>
+                           min={feeFormDefault[timeFrame].min} max={feeFormDefault[timeFrame].max} step={1}/>
                 </div>
                 <p>Max {[feeFormDefault.currencySym, maxPrice]}</p>
             </div>
@@ -90,13 +92,20 @@ class FeeForm extends Component {
             memberFee = membership.fixed_membership_fee_amount * 1.2 :
             ((rentValue > 0 && rentValue < 120) ? memberFee = 120 : memberFee = rentValue * 1.2);
 
-        this.setState({ memberFee: Math.floor(memberFee) })
+        this.setState({memberFee: Math.floor(memberFee)})
     };
 
     postCodeHandler = (event) => this.setState({postCode: event.target.value});
 
-    handleSubmit = (event) => {
-      event.preventDefault();
+    handleSubmit = async (event) => {
+        event.preventDefault();
+        const response = await postUserData();
+
+        if (response.status === "created") {
+            this.props.submitFormHandler(this.state);
+            this.props.history.push('/details')
+        }
+
     };
 
     render() {
@@ -108,7 +117,7 @@ class FeeForm extends Component {
                         <div className="fee_form__price_range__duration__select">
                             <p>
                                 <img src={require('../../img/calendar.png')} alt="calendar"/>
-                                {this.state.timeRange}
+                                {this.state.timeFrame}
                                 {this.renderSelect()}
                             </p>
 
@@ -120,14 +129,19 @@ class FeeForm extends Component {
                 <div className="fee_form__post_code">
                     <p><label htmlFor="postcode">Post code</label></p>
                     <div className={"fee_form__post_code__input_wrapper"}>
-                        <input type="text" id="postcode" pattern={UK_POST_CODE} required onChange={this.postCodeHandler}/>
+                        <input type="text" id="postcode" pattern={UK_POST_CODE} required
+                               onChange={this.postCodeHandler}/>
                     </div>
 
                 </div>
                 <div className="fee_form__membership_fee">
                     <div className="fee_form__membership_fee__input_container">
                         <p><label htmlFor="membership">Rent price per week:</label></p>
-                        <div className={"fee_form__membership_fee__input_container__input_wrapper"}><input type="number" min="0" id="membership" required onChange={this.calculateMembershipFee}/></div>
+                        <div className={"fee_form__membership_fee__input_container__input_wrapper"}>
+                            <input type="number" min="0" id="membership"
+                                   required
+                                   onChange={this.calculateMembershipFee}/>
+                        </div>
                     </div>
 
                     <p>Membership fee: <span>{this.state.memberFee}</span> inc. 20% VAT</p>
@@ -142,7 +156,7 @@ class FeeForm extends Component {
 FeeForm.defaultProps = {
     feeFormDefault: {
         currencySym: '£',
-        timeRange: ['week', 'month'],
+        timeFrame: ['week', 'month'],
         week: {
             min: '25',
             max: '2000'
@@ -155,4 +169,4 @@ FeeForm.defaultProps = {
     }
 };
 
-export default FeeForm;
+export default withRouter(FeeForm);

@@ -1,3 +1,14 @@
 $text-grey: #939393;
 $accent-violet: #AF00E4;
 $accent-blue: #194cb6;
+
+%button {
+    border: none;
+    background-color: $accent-violet;
+    border-radius: 4px;
+    text-transform: uppercase;
+    font-weight: bold;
+    color: #fff;
+    cursor: pointer;
+    transition: .3s;
+}
