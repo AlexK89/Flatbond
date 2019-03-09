@@ -1,0 +1,66 @@
+.fee_form {
+  width: 90%;
+  margin: 0 auto;
+  background-color: greenyellow;
+
+  &__price_range {
+    background-color: aliceblue;
+
+    &__duration {
+
+    }
+
+    &__slider {
+
+      p {
+
+      }
+
+      .slider {
+        position: relative;
+        background-color: antiquewhite;
+        height: 40px;
+
+        input {
+          position: absolute;
+          pointer-events: none;
+
+          &::-webkit-slider-thumb {
+            pointer-events: all;
+            position: relative;
+            z-index: 10;
+          }
+
+          &::-ms-thumb {
+            pointer-events: all;
+            position: relative;
+            z-index: 10;
+          }
+
+          &::-moz-range-thumb {
+            pointer-events: all;
+            position: relative;
+            z-index: 10;
+          }
+
+          &::-webkit-slider-runnable-track {
+
+          }
+
+          &::-moz-range-track {
+
+          }
+        }
+      }
+    }
+
+  }
+
+  &__post_code {
+    background-color: aqua;
+  }
+
+  &__submit {
+    background-color: yellow;
+  }
+}
